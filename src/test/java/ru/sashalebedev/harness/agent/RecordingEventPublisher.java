@@ -10,7 +10,7 @@ import java.util.List;
  * Ловит события агента, чтобы проверить, что ядро сообщает о фактах.
  * Заодно доказывает, что подписчиком может быть кто угодно — HUD тут не при чём.
  */
-class RecordingEventPublisher implements ApplicationEventPublisher {
+public class RecordingEventPublisher implements ApplicationEventPublisher {
 
     private final List<AgentEvent> events = new ArrayList<>();
 
@@ -21,7 +21,7 @@ class RecordingEventPublisher implements ApplicationEventPublisher {
         }
     }
 
-    List<AgentEvent> events() {
+    public List<AgentEvent> events() {
         return List.copyOf(events);
     }
 }

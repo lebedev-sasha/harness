@@ -34,5 +34,17 @@ dependencyManagement {
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	useJUnitPlatform {
+		// Живые тесты на поднятой Ollama работают секундами и требуют docker compose up,
+		// поэтому в обычный прогон не попадают. Запускать отдельно: gradlew ollamaTest
+		excludeTags 'ollama'
+	}
+}
+
+tasks.register('ollamaTest', Test) {
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	useJUnitPlatform {
+		includeTags 'ollama'
+	}
 }

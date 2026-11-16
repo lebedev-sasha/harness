@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ConversationTest {
 
     @Test
-    void системныйПромптПопадаетВПромпт() {
+    void systemPromptIsIncludedInPrompt() {
         Conversation conversation = new Conversation("SYSTEM");
         conversation.addUserMessage("привет");
 
@@ -18,7 +18,7 @@ class ConversationTest {
     }
 
     @Test
-    void собираетПромптВПравильномПорядке() {
+    void assemblesPromptInCorrectOrder() {
         Conversation conversation = new Conversation("SYSTEM");
         conversation.addUserMessage("вопрос");
         conversation.addAssistantMessage(new AssistantMessage("ответ"));
@@ -27,6 +27,4 @@ class ConversationTest {
                 .extracting(Message::getMessageType)
                 .containsExactly(MessageType.SYSTEM, MessageType.USER, MessageType.ASSISTANT);
     }
-
-
 }

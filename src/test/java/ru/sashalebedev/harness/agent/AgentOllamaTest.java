@@ -9,10 +9,11 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Тест на живой модели. Исключён из обычного {@code mvnw test} (см. excludedGroups в pom.xml),
- * потому что требует поднятой Ollama и работает секундами, а не миллисекундами.
+ * Тест на живой модели. Исключён из обычного {@code gradlew test} (тег "ollama"
+ * исключён в build.gradle), потому что требует поднятой Ollama и работает
+ * секундами, а не миллисекундами.
  *
- * <p>Прогнать только его: {@code mvnw test -Dgroups=ollama -Dexcluded.groups=}
+ * <p>Прогнать только его: {@code gradlew ollamaTest}
  */
 @Tag("ollama")
 @SpringBootTest
@@ -23,7 +24,7 @@ class AgentOllamaTest {
     private Agent agent;
 
     @Test
-    void модельОтвечаетИНеДуматьВслух() {
+    void modelAnswersWithoutThinkingOutLoud() {
         String answer = agent.run("Reply with exactly one short sentence about yourself.");
 
         assertThat(answer).isNotBlank();

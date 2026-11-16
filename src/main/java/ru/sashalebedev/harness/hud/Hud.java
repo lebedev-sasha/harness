@@ -7,9 +7,12 @@ import org.springframework.stereotype.Component;
 import ru.sashalebedev.harness.agent.Agent;
 import ru.sashalebedev.harness.agent.event.AgentEvent;
 import ru.sashalebedev.harness.context.TokenEstimator;
+import ru.sashalebedev.harness.tool.Tool;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import static ru.sashalebedev.harness.hud.BodyPart.*;
 import static ru.sashalebedev.harness.hud.LanguageUtils.plural;
@@ -18,11 +21,15 @@ import static ru.sashalebedev.harness.hud.LanguageUtils.plural;
 public class Hud {
 
     private final MachineViewPrinter machinePrinter;
+
     private final Agent agent;
 
-    public Hud(MachineViewPrinter machinePrinter, Agent agent) {
+    private final List<Tool<?>> tools;
+
+    public Hud(MachineViewPrinter machinePrinter, Agent agent, List<Tool<?>> tools) {
         this.machinePrinter = machinePrinter;
         this.agent = agent;
+        this.tools = tools;
     }
 
     @EventListener(ApplicationStartedEvent.class)
@@ -31,14 +38,24 @@ public class Hud {
     }
 
     private List<BootLine> collectBootLines(int beanDefinitionCount) {
-        List<BootLine> lines = new ArrayList<>();
-        lines.add(BootLine.of(POWER_CELL, BootStatus.ONLINE,
-                "спринг контекст " + plural(beanDefinitionCount, "бин", "бина", "бинов"))) ;
-        lines.add(BootLine.of(NEUROPROCESSOR,BootStatus.ONLINE, agent.chatModel()));
-        lines.add(BootLine.of(MEMORY_BANK, BootStatus.ONLINE, agent.conversation().getClass().getSimpleName()));
-        lines.add(BootLine.of(DIAGNOSTIC_BUS,BootStatus.ONLINE,"Agent Events: " + AgentEvent.class.getPermittedSubclasses().length));
-        return lines;
+        Map<BodyPart, BootLine> lines = new EnumMap<>(BodyPart.class);
 
+        lines.put(POWER_CELL, BootLine.of(POWER_CELL, BootStatus.ONLINE, "спринг контекст " + plural(beanDefinitionCount, "бин", "бина", "бинов")));
+        lines.put(NEUROPROCESSOR, BootLine.of(NEUROPROCESSOR, BootStatus.ONLINE, agent.chatModel()));
+        lines.put(MEMORY_BANK, BootLine.of(MEMORY_BANK, BootStatus.ONLINE, agent.conversation().getClass().getSimpleName()));
+        lines.put(DIAGNOSTIC_BUS, BootLine.of(DIAGNOSTIC_BUS, BootStatus.ONLINE, "Agents events: " + AgentEvent.class.getPermittedSubclasses().length));
+
+        for (Tool<?> tool : tools) {
+            BodyPart part = BodyPart.forToolName(tool.name());
+            BootLine bootLine = lines.computeIfAbsent(part, BootLine::empty);
+            bootLine.components().add(tool.name());
+        }
+
+        if (!tools.isEmpty()) {
+            lines.put(TOOL_BUS, BootLine.of(TOOL_BUS, BootStatus.ONLINE, plural(tools.size(), "инструмент", "инструмента", "инструментов")));
+        }
+
+        return List.copyOf(lines.values());
     }
 
     @EventListener
@@ -52,20 +69,25 @@ public class Hud {
 
     @EventListener
     public void onTurnFinished(AgentEvent.TurnFinished event) {
-        machinePrinter.showTurnFinished(event.duration());
+        machinePrinter.showTurnFinished(event.duration(), event.iteration());
     }
 
-    //    @EventListener
-    public void onAgentSpokeEvent(AgentEvent.AgentSpoke event) {
-        String assistantMessage = event.assistantMessage();
-        boolean containsRussian = java.util.regex.Pattern
-                .compile("[А-Яа-яЁё]")
-                .matcher(assistantMessage)
-                .find();
-
-        if (containsRussian) {
-            System.err.println("НЕ ГОВОРИ СО МНОЙ ПО РУССКИ");
-            throw new RuntimeException(assistantMessage);
-        }
+    @EventListener
+    public void onToolCallStarted(AgentEvent.ToolCallStarted event) {
+        machinePrinter.showToolCallStarted(
+                event.description().isBlank() ? event.toolName() : event.description());
     }
+
+    @EventListener
+    public void onToolCallFinished(AgentEvent.ToolCallFinished event) {
+        machinePrinter.showToolCallFinished(
+                event.error(), event.preview(), event.duration());
+    }
+
+    @EventListener
+    public void onTurnLimitReached(AgentEvent.TurnLimitReached event) {
+        machinePrinter.showTurnLimitReached(event.maxTurns());
+    }
+
+
 }
