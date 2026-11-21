@@ -10,6 +10,7 @@ import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import ru.sashalebedev.harness.agent.event.AgentEvent;
+import ru.sashalebedev.harness.tool.SpringAiToolAdapter;
 import ru.sashalebedev.harness.tool.ToolRegistry;
 import ru.sashalebedev.harness.tool.ToolResult;
 

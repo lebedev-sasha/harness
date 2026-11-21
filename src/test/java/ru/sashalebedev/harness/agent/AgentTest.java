@@ -7,10 +7,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import ru.sashalebedev.harness.agent.event.AgentEvent;
-import ru.sashalebedev.harness.tool.StubTool;
-import ru.sashalebedev.harness.tool.Tool;
-import ru.sashalebedev.harness.tool.ToolRegistry;
-import ru.sashalebedev.harness.tool.ToolResult;
+import ru.sashalebedev.harness.tool.*;
 
 import java.util.List;
 

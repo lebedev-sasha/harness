@@ -1,10 +1,8 @@
-package ru.sashalebedev.harness.agent;
+package ru.sashalebedev.harness.tool;
 
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.stereotype.Component;
-import ru.sashalebedev.harness.tool.Tool;
-import ru.sashalebedev.harness.tool.ToolRegistry;
 
 import java.util.List;
 

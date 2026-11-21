@@ -1,8 +1,10 @@
-package ru.sashalebedev.harness.tool;
+package ru.sashalebedev.harness.tool.implementation;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import ru.sashalebedev.harness.agent.AgentProperties;
+import ru.sashalebedev.harness.tool.ToolResult;
+import ru.sashalebedev.harness.tool.WorkspaceGuard;
 
 import java.io.IOException;
 import java.nio.file.Files;

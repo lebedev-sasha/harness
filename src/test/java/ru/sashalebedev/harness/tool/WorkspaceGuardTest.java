@@ -22,7 +22,7 @@ class WorkspaceGuardTest {
     }
 
     @Test
-    void relativePathResolvesInsideRoot() {
+    void relativizePathResolvesInsideRoot() {
         assertThat(guard().resolve("src/Main.java"))
                 .isEqualTo(root.resolve("src").resolve("Main.java"));
     }
@@ -83,8 +83,8 @@ class WorkspaceGuardTest {
     }
 
     @Test
-    void relativeReturnsPathWithForwardSlashes() {
-        assertThat(guard().relative(root.resolve("src").resolve("Main.java")))
+    void relativizeReturnsPathWithForwardSlashes() {
+        assertThat(guard().relativize(root.resolve("src").resolve("Main.java")))
                 .isEqualTo("src/Main.java");
     }
 }

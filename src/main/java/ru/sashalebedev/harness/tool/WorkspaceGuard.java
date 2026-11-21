@@ -37,9 +37,8 @@ public class WorkspaceGuard {
             if (!realPath.startsWith(root.toRealPath())) {
                 throw new WorkspaceViolationException("путь ведёт наружу через симлинк: " + rawPath);
             }
-
-
         } catch (NoSuchFileException e) {
+            // Модель ошиблась именем, или файл еще предстоит создать.
         } catch (IOException cannotVerify) {
             throw new WorkspaceViolationException(
                     "не удалось проверить путь: %s: %s".formatted(rawPath, cannotVerify));
@@ -48,7 +47,7 @@ public class WorkspaceGuard {
         return resolved;
     }
 
-    public String relative(Path path) {
+    public String relativize(Path path) {
         return root.relativize(path).toString().replace("\\", "/");
     }
 

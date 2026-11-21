@@ -1,16 +1,21 @@
-package ru.sashalebedev.harness.tool;
+package ru.sashalebedev.harness.tool.implementation;
 
 import jakarta.annotation.Nullable;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
+import ru.sashalebedev.harness.tool.Tool;
+import ru.sashalebedev.harness.tool.ToolResult;
+import ru.sashalebedev.harness.tool.WorkspaceGuard;
 
-import javax.imageio.IIOException;
 import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+/*
+ * Инструмент, предоставляющий возможность чтения файлов.
+ */
 @Component
 public class FileReadTool implements Tool<FileReadTool.Input> {
 
@@ -67,7 +72,7 @@ public class FileReadTool implements Tool<FileReadTool.Input> {
 
     @Override
     public String renderToolUseMessage(Input input) {
-        return input.filePath();
+        return tag() + " " + input.filePath();
     }
 
     @Override
@@ -83,10 +88,11 @@ public class FileReadTool implements Tool<FileReadTool.Input> {
             return ToolResult.ok("файл не найден " + input.filePath());
         }
         if (Files.isDirectory(pathToFile)) {
-            return ToolResult.error(" - это папка, а не файл " + input.filePath());
+            return ToolResult.error(input.filePath() + " - это папка, а не файл ");
         }
 
         List<String> lines;
+
         try {
             lines = Files.readAllLines(pathToFile);
         } catch (MalformedInputException e) {

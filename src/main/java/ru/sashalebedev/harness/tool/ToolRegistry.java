@@ -14,6 +14,12 @@ import java.util.Map;
 @Component
 public class ToolRegistry {
 
+    // Сколько строк результата уезжает в событие - столько увидит человек.
+    private static final int PREVIEW_LINES = 3;
+
+    // Длинную строку обрезаем: в терминале она все равно переносится.
+    private static final int PREVIEW_CHARS = 100;
+
     private final Map<String, Tool<?>> byName = new LinkedHashMap<>();
 
     private final ApplicationEventPublisher publisher;
@@ -51,7 +57,7 @@ public class ToolRegistry {
                 new AgentEvent.ToolCallFinished(
                         toolName,
                         toolResult.error(),
-                        toolResult.preview(120),
+                        toolResult.preview(PREVIEW_LINES, PREVIEW_CHARS),
                         Duration.between(toolStartedAt, Instant.now()))
         );
 
@@ -76,9 +82,9 @@ public class ToolRegistry {
     private <I> String describeCall(Tool<I> tool, String argumentsJson) {
         try {
             String described = tool.renderToolUseMessage(json.fromJson(argumentsJson, tool.inputType()));
-            return described == null ? "" : described;
-        } catch (Exception e) {
-            return "";
+            return described == null || described.isBlank() ? tool.tag() : described;
+        } catch (Exception argumentsAreBroken) {
+            return tool.tag();
         }
     }
 }
